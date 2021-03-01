@@ -47,7 +47,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 		if ( Texture->GetSizeX() % 4 != 0
 			|| Texture->GetSizeY() % 4 != 0 )
 		{
-			ValidationErrors.Add( FText::FromString( FString::Printf( TEXT( "Texture size must be a multiple of 4. Size is %d x %d " ), Texture->GetSizeX(), Texture->GetSizeY() ) ) );
+			ValidationErrors.Add( FText::FromString( FString::Printf( TEXT( "Texture size must be a multiple of 4. Size is %d x %d." ), Texture->GetSizeX(), Texture->GetSizeY() ) ) );
 		}
 
 		FString Filename = Texture->AssetImportData->GetFirstFilename();
@@ -62,14 +62,13 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 		else if ( !Filename.StartsWith( EditorSettings.DataSourceFolder.Path ) )
 		{
 			ValidationErrors.Add( FText::FromString( FString::Printf(
-				TEXT( "Importing a file from '%s', outside of Data Source Folder '%s" ),
+				TEXT( "Importing a file from '%s', outside of Data Source Folder '%s'" ),
 				*Filename,
 				*EditorSettings.DataSourceFolder.Path ) ) );
 		}
 	}
 
-	ValidationState = ValidationErrors.Num() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
-	return ValidationState;
+	return ValidationErrors.Num() > 0 ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }
 
 #undef LOCTEXT_NAMESPACE
