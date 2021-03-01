@@ -20,8 +20,4 @@ public:
 protected:
 	virtual bool CanValidateAsset_Implementation(UObject* InAsset) const override;
 	virtual EDataValidationResult ValidateLoadedAsset_Implementation(UObject* InAsset, TArray<FText>& ValidationErrors) override;
-
-	const TArray<FString>* FindOrCacheCulturesForLocalizedRoot(const FString& InLocalizedRootPath);
-
-	TMap<FString, TArray<FString>> CachedCulturesForLocalizedRoots;
 };
