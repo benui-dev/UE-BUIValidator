@@ -88,25 +88,30 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 		{
 			if ( ShouldGroupValidateAsset( Group, InAsset ) )
 			{
-				if ( Group.ValidationRule.bUseTextureGroup )
+				if ( Group.ValidationRule.TextureGroups.Num() )
 				{
 					bAnyChecked = true;
 
-					if ( Group.ValidationRule.TextureGroupName != Texture->LODGroup )
+					if ( !Group.ValidationRule.TextureGroups.Contains( Texture->LODGroup ) )
 					{
 						bAnyFailed = true;
+						TArray<FString> TextureGroupNames;
+						for ( const auto& TextureGroup : Group.ValidationRule.TextureGroups )
+						{
+							TextureGroupNames.Add( UTexture::GetTextureGroupString( TextureGroup ) );
+						}
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_TextureGroup", "Texture asset size must be set to texture group '{0}', but is set to texture group '{1}'" ),
-							FText::FromString( UTexture::GetTextureGroupString( Group.ValidationRule.TextureGroupName ) ),
+							FText::FromString( FString::Join( TextureGroupNames, TEXT( ", " ) ) ),
 							FText::FromString( UTexture::GetTextureGroupString( Texture->LODGroup ) ) ),
 							ValidationErrors );
 					}
 				}
 
-				if ( Group.ValidationRule.bUseTextureSizeRequirement )
+				if ( Group.ValidationRule.TextureSizeRequirements.Num() > 0 )
 				{
 					bAnyChecked = true;
-					if ( Group.ValidationRule.TextureSizeRequirement == EBUITextureSizeRequirement::MultipleOfFour
+					if ( Group.ValidationRule.TextureSizeRequirements.Contains( EBUITextureSizeRequirement::MultipleOfFour )
 						&& ( Texture->GetSizeX() % 4 != 0
 							|| Texture->GetSizeY() % 4 != 0 ) )
 					{
@@ -116,7 +121,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 							FText::AsNumber( Texture->GetSizeX() ), FText::AsNumber( Texture->GetSizeY() ) ),
 							ValidationErrors );
 					}
-					else if ( Group.ValidationRule.TextureSizeRequirement == EBUITextureSizeRequirement::PowerOfTwo
+					else if ( Group.ValidationRule.TextureSizeRequirements.Contains( EBUITextureSizeRequirement::PowerOfTwo )
 						&& ( !GetIsPowerOfTwo( Texture->GetSizeX() )
 							|| !GetIsPowerOfTwo( Texture->GetSizeY() ) ) )
 					{
@@ -128,7 +133,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 					}
 				}
 
-				if ( Group.ValidationRule.bUsePrefix )
+				if ( Group.ValidationRule.Prefixes.Num() > 0 )
 				{
 					bAnyChecked = true;
 					const FString Filename = FPaths::GetCleanFilename( ImportAssetPath );
