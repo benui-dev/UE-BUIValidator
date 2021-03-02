@@ -41,6 +41,7 @@ struct FBUIValidationRule
 		}
 	}
 public:
+
 	// Textures must be in one of these Texture Groups
 	UPROPERTY( config, EditAnywhere )
 	TArray<TEnumAsByte<TextureGroup>> TextureGroups = { TextureGroup::TEXTUREGROUP_UI };
@@ -81,11 +82,17 @@ public:
 	UPROPERTY( config, EditAnywhere )
 	FString GroupName;
 
+	// Apply this group's rules to newly-imported assets
+	UPROPERTY( config, EditAnywhere )
+	bool bApplyOnImport = false;
+
 	UPROPERTY( config, EditAnywhere, Category = Conditions )
 	FBUIMatchConditions MatchConditions;
 
 	UPROPERTY( config, EditAnywhere, Category = Requirements )
 	FBUIValidationRule ValidationRule;
+
+	bool ShouldGroupValidateAsset( UObject* InAsset ) const;
 };
 
 UCLASS( config = Game, defaultconfig, AutoExpandCategories = "Validation" )
@@ -96,4 +103,6 @@ class UBUIValidatorSettings : public UObject
 public:
 	UPROPERTY( config, EditAnywhere, Category = Validation, meta = ( TitleProperty = "GroupName" ) )
 	TArray<FBUIValidatorGroup> ValidationGroups;
+
+	bool ShouldValidateAsset( UObject* InAsset ) const;
 };

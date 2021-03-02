@@ -2,6 +2,7 @@
 #include <Engine/Texture2D.h>
 #include <Editor/EditorPerProjectUserSettings.h>
 #include <EditorFramework/AssetImportData.h>
+#include "BUIValidatorSettings.h"
 
 #define LOCTEXT_NAMESPACE "BUIEditorValidator"
 
@@ -13,63 +14,13 @@ UBUIEditorValidator_Textures::UBUIEditorValidator_Textures()
 
 bool UBUIEditorValidator_Textures::CanValidateAsset_Implementation( UObject* InAsset ) const
 {
-	return ShouldValidateAsset( InAsset );
+	const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
+	return ValidatorSettings.ShouldValidateAsset( InAsset );
 }
 
 bool GetIsPowerOfTwo( int32 Num )
 {
 	return ( Num & ( Num - 1 ) ) == 0;
-}
-
-bool UBUIEditorValidator_Textures::ShouldValidateAsset( UObject* InAsset ) const
-{
-	UTexture2D* Texture = Cast<UTexture2D>( InAsset );
-	if ( Texture )
-	{
-		const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
-		for ( const auto& Group : ValidatorSettings.ValidationGroups )
-		{
-			if ( ShouldGroupValidateAsset( Group, InAsset ) )
-				return true;
-		}
-	}
-
-	return false;
-}
-
-bool UBUIEditorValidator_Textures::ShouldGroupValidateAsset( const FBUIValidatorGroup& Group, UObject* InAsset ) const
-{
-	UTexture2D* Texture = Cast<UTexture2D>( InAsset );
-	if ( !Texture )
-		return false;
-
-	const FString AssetPathInUnreal = Texture->GetPathName();
-
-	bool bMatchAnyTextureGroup = Group.MatchConditions.TextureGroups.Num() == 0
-		|| Group.MatchConditions.TextureGroups.Contains( Texture->LODGroup );
-
-	bool bMatchAnyPath = Group.MatchConditions.Paths.Num() == 0;
-	for ( const auto& Path : Group.MatchConditions.Paths )
-	{
-		if ( AssetPathInUnreal.StartsWith( Path.Path ) )
-		{
-			bMatchAnyPath = true;
-			break;
-		}
-	}
-
-	bool bMatchAnyPrefix = Group.MatchConditions.Prefixes.Num() == 0;
-	for ( const auto& Prefix : Group.MatchConditions.Prefixes )
-	{
-		if ( FPaths::GetCleanFilename( AssetPathInUnreal ).StartsWith( Prefix ) )
-		{
-			bMatchAnyPrefix = true;
-			break;
-		}
-	}
-
-	// Let's apply rules to this texture
-	return bMatchAnyTextureGroup && bMatchAnyPath && bMatchAnyPrefix;
 }
 
 EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implementation( UObject* InAsset, TArray<FText>& ValidationErrors )
@@ -86,7 +37,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 		// First see if this matches
 		for ( const auto& Group : ValidatorSettings.ValidationGroups )
 		{
-			if ( ShouldGroupValidateAsset( Group, InAsset ) )
+			if ( Group.ShouldGroupValidateAsset( InAsset ) )
 			{
 				if ( Group.ValidationRule.TextureGroups.Num() )
 				{

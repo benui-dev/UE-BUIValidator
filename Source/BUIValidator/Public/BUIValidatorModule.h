@@ -17,4 +17,6 @@ public:
 protected:
 	bool HandleSettingsSaved();
 
+	void OnPostEngineInit();
+	void OnObjectReimported( UFactory* ImportFactory, UObject* InObject );
 };
