@@ -86,22 +86,22 @@ public:
 	UPROPERTY( config, EditAnywhere )
 	bool bApplyOnImport = false;
 
-	UPROPERTY( config, EditAnywhere, Category = Conditions )
+	UPROPERTY( config, EditAnywhere, Category = "Validation", meta = ( ShowOnlyInnerProperties ) )
 	FBUIMatchConditions MatchConditions;
 
-	UPROPERTY( config, EditAnywhere, Category = Requirements )
+	UPROPERTY( config, EditAnywhere, Category = "Validation", meta = ( ShowOnlyInnerProperties ) )
 	FBUIValidationRule ValidationRule;
 
 	bool ShouldGroupValidateAsset( UObject* InAsset ) const;
 };
 
-UCLASS( config = Game, defaultconfig, AutoExpandCategories = "Validation" )
+UCLASS( config = Game, defaultconfig ) //, AutoExpandCategories = "Validation" )
 class UBUIValidatorSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY( config, EditAnywhere, Category = Validation, meta = ( TitleProperty = "GroupName" ) )
+	UPROPERTY( config, EditAnywhere, Category = "Validation", meta = ( TitleProperty = "GroupName", ShowOnlyInnerProperties ) )
 	TArray<FBUIValidatorGroup> ValidationGroups;
 
 	bool ShouldValidateAsset( UObject* InAsset ) const;
