@@ -19,11 +19,11 @@ public:
 	TArray<TEnumAsByte<TextureGroup>> TextureGroups = { TextureGroup::TEXTUREGROUP_UI };
 
 	// Match UTexture2D assets with any of these prefixes
-	UPROPERTY( config, EditAnywhere, Category = Custom )
+	UPROPERTY( config, EditAnywhere, Category = Custom ) 
 	TArray<FString> Prefixes = { "T_UI_" };
 
 	// Match UTexture2D assets under any of these directories
-	UPROPERTY( EditAnywhere, meta = ( ContentDir ) )
+	UPROPERTY( EditAnywhere, meta = ( ContentDir, TitleProperty = "Path" ) )
 	TArray<FDirectoryPath> Paths;
 };
 
@@ -41,9 +41,20 @@ struct FBUIValidationRule
 		}
 	}
 public:
-	// Textures not with this Texture Group will fail
+	// Textures must be in one of these Texture Groups
 	UPROPERTY( config, EditAnywhere )
 	TArray<TEnumAsByte<TextureGroup>> TextureGroups = { TextureGroup::TEXTUREGROUP_UI };
+
+	// Textures must have one of these Compression Settings
+	UPROPERTY( config, EditAnywhere )
+	TArray<TEnumAsByte<TextureCompressionSettings>> CompressionSettings = { TextureCompressionSettings::TC_Default };
+
+	// Textures must have one of these pixel formats
+	UPROPERTY( config, EditAnywhere )
+	TArray<TEnumAsByte<EPixelFormat>> PixelFormats = { EPixelFormat::PF_DXT5 };
+
+	UPROPERTY( config, EditAnywhere )
+	TArray<TEnumAsByte<TextureMipGenSettings>> MipGenSettings = { TextureMipGenSettings::TMGS_FromTextureGroup };
 
 	// Textures must have one of these prefixes
 	UPROPERTY( config, EditAnywhere )
@@ -67,6 +78,9 @@ struct FBUIValidatorGroup
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY( config, EditAnywhere )
+	FString GroupName;
+
 	UPROPERTY( config, EditAnywhere, Category = Conditions )
 	FBUIMatchConditions MatchConditions;
 
@@ -74,12 +88,12 @@ public:
 	FBUIValidationRule ValidationRule;
 };
 
-UCLASS( config = Game, defaultconfig )
+UCLASS( config = Game, defaultconfig, AutoExpandCategories = "Validation" )
 class UBUIValidatorSettings : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY( config, EditAnywhere, Category = Validation )
+	UPROPERTY( config, EditAnywhere, Category = Validation, meta = ( TitleProperty = "GroupName" ) )
 	TArray<FBUIValidatorGroup> ValidationGroups;
 };
