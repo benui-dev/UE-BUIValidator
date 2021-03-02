@@ -37,7 +37,7 @@ void FBUIValidatorModule::ShutdownModule()
 
 	if ( GIsEditor )
 	{
-		if ( GEditor && GetEditorSubsystem<UImportSubsystem>() )
+		if ( GEditor && GEditor->GetEditorSubsystem<UImportSubsystem>() )
 			GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetPostImport.RemoveAll( this );
 	}
 }
