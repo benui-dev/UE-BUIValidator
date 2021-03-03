@@ -34,7 +34,9 @@ For a rule to be triggered, **all** conditions of the match must pass.
 
 #### Validator Rules
 
-For a rule to pass, the asset must match **any** of the 
+Each rule allows multiple values for a given setting. For example a texture
+could be allowed to be within World or UI. To pass, the asset must match
+**any** of the values.
 
 * **Texture groups:** Textures must have one of the specified Texture Groups.
 * **Compression Settings:** Textures must have one of the specified
