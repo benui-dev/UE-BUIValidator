@@ -50,26 +50,27 @@ public:
 	UPROPERTY( config, EditAnywhere )
 	TArray<TEnumAsByte<TextureCompressionSettings>> CompressionSettings = { TextureCompressionSettings::TC_Default };
 
-	// Textures must have one of these pixel formats
+	// Textures must have one of these Pixel Formats
 	UPROPERTY( config, EditAnywhere )
 	TArray<TEnumAsByte<EPixelFormat>> PixelFormats = { EPixelFormat::PF_DXT5 };
 
+	// Textures must have one of these mip gen settings
 	UPROPERTY( config, EditAnywhere )
 	TArray<TEnumAsByte<TextureMipGenSettings>> MipGenSettings = { TextureMipGenSettings::TMGS_FromTextureGroup };
 
-	// Textures must have one of these prefixes
+	// Textures must have one of these prefixes. Is not applied on import
 	UPROPERTY( config, EditAnywhere )
 	TArray<FString> Prefixes = { "T_UI_" };
 
-	// Textures must pass these size requirements.
+	// Textures must pass these size requirements. Is not applied on import
 	UPROPERTY( config, EditAnywhere )
 	TSet<EBUITextureSizeRequirement> TextureSizeRequirements = { EBUITextureSizeRequirement::MultipleOfFour };
 
-	// Textures not in this path within Unreal will fail.
+	// Textures must be within this path in Unreal. Is not applied on import
 	UPROPERTY( EditAnywhere, meta = ( ContentDir ) )
 	TArray<FDirectoryPath> Paths;
 
-	// Require that the Data Source Folder be set in Editor Preferences, and that assets are imported from there.
+	// Require that the Data Source Folder be set in Editor Preferences, and that assets are imported from there
 	UPROPERTY( EditAnywhere )
 	bool bRequireDataSourceFolder = true;
 };
