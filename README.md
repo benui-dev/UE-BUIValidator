@@ -1,6 +1,17 @@
-# UE4 UI Texture Validator Plugin
+# UE4 Texture Validator Plugin
 
-Set up rules to be applied when textures are imported
+A plugin that validates settings for texture assets in Unreal Engine 4.
+
+
+## What can it do?
+
+* Throw errors when texture size, texture group and other properties do not
+  match customizable rules.
+* Automatically set default values for new textures upon import.
+* Set different validation rules for textures with different prefixes, or for
+  different folders within Unreal.
+* Throw errors when users import textures without setting the Data Source
+  Folder in their Editor Settings.
 
 ## Usage
 
@@ -35,7 +46,7 @@ For a rule to pass, the asset must match **any** of the
   requirements are "Multiple of Four" or "Power of Two"
 * **Paths:** Textures must be within this path in Unreal.
 * **Require Data Source Folder:** Require that the Data Source Folder be set in
-  Editor Preferences, and that assets are imported from there. This is to aid [reimporting between team members](https://benui.ca/unreal/reimporting-assets/)).
+  Editor Preferences, and that assets are imported from there. This is to aid [reimporting between team members](https://benui.ca/unreal/reimporting-assets/).
 
 #### Auto-apply settings to new textures
 
