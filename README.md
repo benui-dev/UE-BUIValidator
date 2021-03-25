@@ -88,3 +88,10 @@ If the asset does not pass, an error is shown.
 If you find it useful, drop me a line [@_benui](https://twitter.com/_benui) on Twitter.
 
 [benui.ca](https://benui.ca)
+
+
+## Future Work
+
+* Add support for validating builds using the [Data
+  Validation plugin](https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/Assets/DataValidation/index.html)
+
