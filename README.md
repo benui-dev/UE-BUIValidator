@@ -12,6 +12,7 @@ A plugin that validates settings for texture assets in Unreal Engine 4.
   different folders within Unreal.
 * Throw errors when users import textures without setting the Data Source
   Folder in their Editor Settings.
+* Throw errors when `UPROPERTY()` values are not set.
 
 ## Usage
 
@@ -57,6 +58,18 @@ newly-imported assets that match the group will have some rules automatically
 applied to them.
 
 Prefix, Texture Size and Path rules are not applied on import.
+
+### C++ UPROPERTY() Settings
+
+The plugin also supports making `UPROPERTY` properties _required_.
+
+```cpp
+// If this is not set, the BP will show an error on save
+UPROPERTY( EditAnywhere, meta = ( BUIRequired = "true" ) )
+TSubclassOf<AActor> RequiredActor;
+```
+
+![BUIRequired flow example](https://benui.ca/assets/unreal/buivalidator-buirequired.png)
 
 ### Running Validation
 

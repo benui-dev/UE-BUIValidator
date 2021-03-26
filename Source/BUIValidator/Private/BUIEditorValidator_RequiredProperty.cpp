@@ -7,6 +7,8 @@
 
 #define LOCTEXT_NAMESPACE "BUIEditorValidator"
 
+const FName UBUIEditorValidator_RequiredProperty::PropertyName = "BUIRequired";
+
 UBUIEditorValidator_RequiredProperty::UBUIEditorValidator_RequiredProperty()
 	: Super()
 {
@@ -27,7 +29,7 @@ bool UBUIEditorValidator_RequiredProperty::CanValidateAsset_Implementation( UObj
 	}
 	for ( TFieldIterator<FProperty> PropertyIterator( AssetClass ); PropertyIterator; ++PropertyIterator )
 	{
-		if ( PropertyIterator->HasMetaData( "BUIRequired" ) )
+		if ( PropertyIterator->GetBoolMetaData( PropertyName ) )
 		{
 			return true;
 		}
@@ -44,69 +46,32 @@ EDataValidationResult UBUIEditorValidator_RequiredProperty::ValidateLoadedAsset_
 	UBlueprint* Bp = Cast<UBlueprint>( InAsset );
 	if ( Bp && Bp->ParentClass )
 	{
-		AssetClass = Bp->ParentClass;
+		AssetClass = Bp->GeneratedClass;
 	}
 	else
 	{
 		AssetClass = InAsset->GetClass();
 	}
 
-	UObject* MyCDO = AssetClass->ClassDefaultObject;
+	UObject* MyCDO = AssetClass->GetDefaultObject( true );
 	for ( TFieldIterator<FProperty> PropertyIterator( AssetClass ); PropertyIterator; ++PropertyIterator )
 	{
-		if ( PropertyIterator->HasMetaData( "BUIRequired" ) )
+		if ( PropertyIterator->GetBoolMetaData( PropertyName ) )
 		{
 			bAnyChecked = true;
-			FObjectProperty* ObjProp = CastField<FObjectProperty>( *PropertyIterator );
+			FObjectPropertyBase* ObjProp = CastField<FObjectPropertyBase>( *PropertyIterator );
 			if ( ObjProp )
 			{
-				// How can I tell if the object property is "set"? Whether it's pointing to an object?
-				UObject* ValueA = ObjProp->GetObjectPropertyValue_InContainer( InAsset );
-				UObject* ValueB = ObjProp->GetObjectPropertyValue_InContainer( Bp );
-				UObject* ValueC = ObjProp->GetObjectPropertyValue_InContainer( Bp->ParentClass );
+				UObject* Something = ObjProp->GetObjectPropertyValue_InContainer( MyCDO );
 
-				UObject* Container1 = ObjProp->GetPropertyValue_InContainer( InAsset );
-				UObject* Container2 = ObjProp->GetPropertyValue_InContainer( Bp );
-				UObject* Container3 = ObjProp->GetPropertyValue_InContainer( Bp->ParentClass );
-				UObject* Container4 = ObjProp->GetPropertyValue_InContainer( MyCDO );
-
-				UObject** ContainerA = ObjProp->GetPropertyValuePtr_InContainer( InAsset );
-				UObject** ContainerB = ObjProp->GetPropertyValuePtr_InContainer( Bp );
-				UObject** ContainerC = ObjProp->GetPropertyValuePtr_InContainer( Bp->ParentClass );
-				UObject** ContainerD = ObjProp->GetPropertyValuePtr_InContainer( MyCDO );
-
-
-				//const void* ObjectContainer1 = ObjProp->ContainerPtrToValuePtr<const void>( Bp->ClassDefaultObject );
-				//const UObject* Object1 = ObjProp->GetObjectPropertyValue( ObjectContainer1 );
-
-				//const void* ObjectContainer2 = ObjProp->ContainerPtrToValuePtr<const void>( InAsset->GetClass()->GetDefaultObject() );
-				//const UObject* Object2 = ObjProp->GetObjectPropertyValue( ObjectContainer2 );
-
-				//const void* ObjectContainer3 = ObjProp->ContainerPtrToValuePtr<const void>( AssetClass->GetDefaultObject() );
-				//const UObject* Object3 = ObjProp->GetObjectPropertyValue( ObjectContainer3 );
-
-				//UObject* ValueD = ObjProp->GetObjectPropertyValue( PropertyIterator->ContainerPtrToValuePtr<UObject*>( AssetClass ) );
-				//UObject* ValueE = ObjProp->GetObjectPropertyValue( PropertyIterator->ContainerPtrToValuePtr<UObject*>( Bp ) );
-				//UObject* ValueF = ObjProp->GetObjectPropertyValue( PropertyIterator->ContainerPtrToValuePtr<UObject*>( InAsset ) );
-				//UObject** Container2 = ObjProp->GetPropertyValuePtr( MyCDO );
-				//UObject* Value1 = ObjProp->GetObjectPropertyValue( Container1 );
-				//UObject* Value2 = ObjProp->GetObjectPropertyValue( Container2 );
-				//UObject* ValueG = ObjProp->GetObjectPropertyValue( PropertyIterator->ContainerPtrToValuePtr<UObject*>( MyCDO ) );
-				//UObject* ValueH = ObjProp->GetObjectPropertyValue( MyCDO );
-				//UObject* ValueC = ObjProp->GetObjectPropertyValue_InContainer( InAsset->ClassDefaultObject );
-				//UObject* ValueD = ObjProp->GetObjectPropertyValue_InContainer( AssetClass->ClassDefaultObject );
-				//UObject* ValueE = ObjProp->GetObjectPropertyValue_InContainer( Bp->ClassDefaultObject );
-				//UObject* Container1 = ObjProp->GetPropertyValuePtr()<UObject*>( InAsset );
-				//UObject* Value1 = ObjProp->GetObjectPropertyValue( Container1 );
-				//UObject* Value2 = ObjProp->GetObjectPropertyValue( ObjProp->ContainerPtrToValuePtr<void>( InAsset ) );
-				//UObject* Value3 = ObjProp->GetObjectPropertyValue( ObjProp->ContainerPtrToValuePtr<UObject*>( Bp ) );
-				//UObject* Value4 = ObjProp->GetObjectPropertyValue( ObjProp->ContainerPtrToValuePtr<void>( Bp ) );
-				//UObject* Value5 = ObjProp->GetObjectPropertyValue( ObjProp->ContainerPtrToValuePtr<UObject*>( AssetClass->ClassDefaultObject ) );
-				//UObject* Value6 = ObjProp->GetObjectPropertyValue( ObjProp->ContainerPtrToValuePtr<void>( AssetClass->ClassDefaultObject ) );
-				if (ValueA->IsValidLowLevel() )
+				if ( Something == nullptr )
 				{
 					bAnyFailed = true;
-					AssetFails( InAsset, LOCTEXT( "BUIValidatorError_NotSet", "All class variables marked BUIRequired must be set to non-null" ), ValidationErrors );
+					AssetFails( InAsset, FText::FormatNamed(
+						LOCTEXT( "BUIValidatorError_NotSet", "Property '{PropertyName}' is not set. All variables marked with '{BUIMetaName}' must be set to non-null" ),
+						"PropertyName", ObjProp->GetDisplayNameText(),
+						"BUIMetaName", FText::FromName( PropertyName ) ),
+						ValidationErrors );
 				}
 			}
 		}

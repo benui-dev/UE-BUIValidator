@@ -12,6 +12,7 @@ public:
 	UBUIEditorValidator_RequiredProperty();
 
 protected:
+	static const FName PropertyName;
 	virtual bool CanValidateAsset_Implementation( UObject* InAsset ) const override;
 	virtual EDataValidationResult ValidateLoadedAsset_Implementation( UObject* InAsset, TArray<FText>& ValidationErrors ) override;
 };
