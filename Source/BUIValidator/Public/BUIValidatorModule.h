@@ -7,12 +7,12 @@
 class FBUIValidatorModule : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
+	// Begin IModuleInterface
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
 
-	bool SupportsDynamicReloading() override { return true; }
+	virtual bool SupportsDynamicReloading() override { return true; }
+	// End IModuleInterface
 
 protected:
 	bool HandleSettingsSaved();

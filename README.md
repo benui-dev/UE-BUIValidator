@@ -13,6 +13,7 @@ A plugin that validates settings for texture assets in Unreal Engine 4.
 * Throw errors when users import textures without setting the Data Source
   Folder in their Editor Settings.
 * Throw errors when `UPROPERTY()` values are not set.
+* Run all rules and validate assets from command-line
 
 ## Usage
 
@@ -77,6 +78,14 @@ Whenever UTexture2D asset is saved, the rules in Project Settings are applied.
 If the asset does not pass, an error is shown.
 
 ![Failure example](https://benui.ca/assets/unreal/validator-fail-example.png)
+
+### Command-line Validation
+
+This is useful when validating assets as part of a build process.
+
+```
+"C:\Program Files\Epic Games\UE_5.0EA\Engine\Binaries\Win64\UnrealEditor-Win64-DebugGame-Cmd.exe" -run=BUIValidateAll
+```
 
 ## Installation
 

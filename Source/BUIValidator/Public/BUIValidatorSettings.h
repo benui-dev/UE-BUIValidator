@@ -86,6 +86,10 @@ public:
 	// Apply this group's rules to newly-imported assets
 	UPROPERTY( config, EditAnywhere )
 	bool bApplyOnImport = false;
+	
+	// Apply this group's rules when running BUIValidateAll from the commandlet
+	UPROPERTY( config, EditAnywhere )
+	bool bRunInCommandlet = true;
 
 	UPROPERTY( config, EditAnywhere, Category = "Validation", meta = ( ShowOnlyInnerProperties ) )
 	FBUIMatchConditions MatchConditions;

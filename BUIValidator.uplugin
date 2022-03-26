@@ -1,15 +1,15 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
+	"VersionName": "1.1",
 	"FriendlyName": "BUIValidator",
-	"Description": "Validate assets",
+	"Description": "Validate assets based on rules",
 	"Category": "Other",
 	"CreatedBy": "benui",
 	"CreatedByURL": "https://benui.ca/",
-	"DocsURL": "",
+	"DocsURL": "https://github.com/benui-dev/UE4-BUIValidator",
 	"MarketplaceURL": "",
-	"SupportURL": "",
+	"SupportURL": "https://github.com/benui-dev/UE4-BUIValidator",
 	"CanContainContent": false,
 	"IsBetaVersion": false,
 	"IsExperimentalVersion": false,
@@ -17,7 +17,7 @@
 	"Modules": [
 		{
 			"Name": "BUIValidator",
-			"Type": "EditorNoCommandlet",
+			"Type": "Editor",
 			"LoadingPhase": "Default",
 			"WhitelistPlatforms": [ "Win64", "Mac", "Linux" ]
 		}
