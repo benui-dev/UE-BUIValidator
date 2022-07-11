@@ -115,5 +115,5 @@ If you find it useful, drop me a line [@_benui](https://twitter.com/_benui) on T
 ## Future Work
 
 * Add support for validating builds using the [Data
-  Validation plugin](https://docs.unrealengine.com/en-US/ProgrammingAndScripting/ProgrammingWithCPP/Assets/DataValidation/index.html)
+  Validation plugin](https://docs.unrealengine.com/5.0/en-US/data-validation/)
 
