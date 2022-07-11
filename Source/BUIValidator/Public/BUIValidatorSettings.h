@@ -47,7 +47,7 @@ public:
 	// Match UTexture2D assets under any of these directories
 	UPROPERTY( EditAnywhere, meta = ( TitleProperty = "Path" ) )
 	TArray<FBUIPathFilter> Paths = {
-		{ EBUIPathType::EndsWith, "/UI/" }
+		{ EBUIPathType::Contains, "/UI/" }
 	};
 };
 
