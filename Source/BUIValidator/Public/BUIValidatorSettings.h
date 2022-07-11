@@ -9,6 +9,28 @@ enum class EBUITextureSizeRequirement
 	PowerOfTwo,
 };
 
+UENUM()
+enum class EBUIPathType
+{
+	Contains,
+	EndsWith,
+	StartsWith,
+};
+
+USTRUCT( meta = ( ToolTip = " Match any part of an asset directory." ) )
+struct FBUIPathFilter
+{
+	GENERATED_BODY()
+
+	// Which part of the directory path to search in. `EndsWith` and `Contains` are useful for content plugins. `StartsWith` is the default for backwards-compatibility.
+	UPROPERTY( EditAnywhere, meta = ( DisplayName = "Path" ) )
+	EBUIPathType Type = EBUIPathType::StartsWith;
+	
+	// Match UTexture2D assets under any of these directories
+	UPROPERTY( EditAnywhere, meta = ( DisplayName = "Path segment" ) )
+	FString Path;
+};
+
 USTRUCT( meta = ( ToolTip = "All parts of a rule must pass in order for the rule to be applied" ) )
 struct FBUIMatchConditions
 {
@@ -23,8 +45,10 @@ public:
 	TArray<FString> Prefixes = { "T_UI_" };
 
 	// Match UTexture2D assets under any of these directories
-	UPROPERTY( EditAnywhere, meta = ( ContentDir, TitleProperty = "Path" ) )
-	TArray<FDirectoryPath> Paths;
+	UPROPERTY( EditAnywhere, meta = ( TitleProperty = "Path" ) )
+	TArray<FBUIPathFilter> Paths = {
+		{ EBUIPathType::Contains, "/UI/" }
+	};
 };
 
 USTRUCT()
