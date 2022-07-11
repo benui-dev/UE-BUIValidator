@@ -33,7 +33,9 @@ bool FBUIValidatorGroup::ShouldGroupValidateAsset( UObject* InAsset ) const
 	bool bMatchAnyPath = MatchConditions.Paths.Num() == 0;
 	for ( const auto& Path : MatchConditions.Paths )
 	{
-		if ( AssetPathInUnreal.StartsWith( Path.Path ) )
+		if ( Path.Type == EBUIPathType::StartsWith && AssetPathInUnreal.StartsWith( Path.Path ) ||
+			Path.Type == EBUIPathType::EndsWith && AssetPathInUnreal.EndsWith( Path.Path ) ||
+			Path.Type == EBUIPathType::Contains && AssetPathInUnreal.Contains( Path.Path ) )
 		{
 			bMatchAnyPath = true;
 			break;
