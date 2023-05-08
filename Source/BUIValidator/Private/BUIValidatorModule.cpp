@@ -57,29 +57,25 @@ void FBUIValidatorModule::OnObjectReimported( UFactory* ImportFactory, UObject* 
 		return;
 
 	// Only apply defaults to newly-imported assets
-	UTextureFactory* TextureFactory = Cast<UTextureFactory>( ImportFactory );
-	if ( !TextureFactory->bUsingExistingSettings )
+	const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
+	for ( const auto& Group : ValidatorSettings.ValidationGroups )
 	{
-		const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
-		for ( const auto& Group : ValidatorSettings.ValidationGroups )
+		if ( Group.bApplyOnImport
+			&& Group.ShouldGroupValidateAsset( InObject ) )
 		{
-			if ( Group.bApplyOnImport
-				&& Group.ShouldGroupValidateAsset( InObject ) )
+			if ( Group.ValidationRule.TextureGroups.Num() > 0 && !Group.ValidationRule.TextureGroups.Contains( Texture->LODGroup ) )
 			{
-				if ( Group.ValidationRule.TextureGroups.Num() > 0 )
-				{
-					Texture->LODGroup = Group.ValidationRule.TextureGroups[ 0 ];
-				}
+				Texture->LODGroup = Group.ValidationRule.TextureGroups[ 0 ];
+			}
 
-				if ( Group.ValidationRule.CompressionSettings.Num() > 0 )
-				{
-					Texture->CompressionSettings = Group.ValidationRule.CompressionSettings[ 0 ];
-				}
+			if ( Group.ValidationRule.CompressionSettings.Num() > 0 && !Group.ValidationRule.CompressionSettings.Contains( Texture->CompressionSettings ) )
+			{
+				Texture->CompressionSettings = Group.ValidationRule.CompressionSettings[ 0 ];
+			}
 
-				if ( Group.ValidationRule.MipGenSettings.Num() > 0 )
-				{
-					Texture->MipGenSettings = Group.ValidationRule.MipGenSettings[ 0 ];
-				}
+			if ( Group.ValidationRule.MipGenSettings.Num() > 0 && !Group.ValidationRule.MipGenSettings.Contains( Texture->MipGenSettings ))
+			{
+				Texture->MipGenSettings = Group.ValidationRule.MipGenSettings[ 0 ];
 			}
 		}
 	}
