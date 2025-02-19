@@ -1,7 +1,6 @@
-# UE4 Texture Validator Plugin
+# Unreal Engine Texture Validator Plugin
 
-A plugin that validates settings for texture assets in Unreal Engine 4.
-
+A plugin that both validates and automatically applies settings for texture assets in Unreal Engine.
 
 ## What can it do?
 
@@ -32,6 +31,7 @@ For a rule to be triggered, **all** conditions of the match must pass.
 
 * **Texture groups:** Match textures with _any_ of the texture groups.
 * **Prefixes:** Match textures with _any_ of the asset name prefixes.
+* **Suffixes:** Match textures with _any_ of the asset name suffixes.
 * **Paths:** Match textures in _any_ of the asset directories.
 
 #### Validator Rules
@@ -114,6 +114,9 @@ If you find it useful, drop me a line [@_benui](https://twitter.com/_benui) on T
 
 ## Future Work
 
-* Add support for validating builds using the [Data
-  Validation plugin](https://docs.unrealengine.com/5.0/en-US/data-validation/)
+* Add support for validating builds using the [Data Validation plugin](https://docs.unrealengine.com/5.0/en-US/data-validation/)
+* Regular expression support
+* More explicit support for And/Or matching
+* Support more texture settings (sRGB, others)
+* Support more data types
 

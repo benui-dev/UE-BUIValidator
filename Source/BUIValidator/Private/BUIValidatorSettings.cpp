@@ -49,9 +49,19 @@ bool FBUIValidatorGroup::ShouldGroupValidateAsset( UObject* InAsset ) const
 			break;
 		}
 	}
+	
+	bool bMatchAnySuffix = MatchConditions.Suffixes.Num() == 0;
+	for ( const auto& Suffix : MatchConditions.Suffixes )
+	{
+		if ( FPaths::GetCleanFilename( AssetPathInUnreal ).EndsWith( Suffix ) )
+		{
+			bMatchAnySuffix = true;
+			break;
+		}
+	}
 
 	// Let's apply rules to this texture
-	return bMatchAnyTextureGroup && bMatchAnyPath && bMatchAnyPrefix;
+	return bMatchAnyTextureGroup && bMatchAnyPath && bMatchAnyPrefix && bMatchAnySuffix;
 }
 
 #undef LOCTEXT_NAMESPACE

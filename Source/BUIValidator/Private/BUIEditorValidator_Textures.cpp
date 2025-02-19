@@ -12,10 +12,10 @@ UBUIEditorValidator_Textures::UBUIEditorValidator_Textures()
 	bIsEnabled = true;
 }
 
-bool UBUIEditorValidator_Textures::CanValidateAsset_Implementation( UObject* InAsset ) const
+bool UBUIEditorValidator_Textures::CanValidateAsset_Implementation( const FAssetData& InAssetData, UObject* InObject, FDataValidationContext& InContext ) const
 {
 	const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
-	return ValidatorSettings.ShouldValidateAsset( InAsset );
+	return ValidatorSettings.ShouldValidateAsset( InObject );
 }
 
 bool GetIsPowerOfTwo( int32 Num )
@@ -23,7 +23,7 @@ bool GetIsPowerOfTwo( int32 Num )
 	return ( Num & ( Num - 1 ) ) == 0;
 }
 
-EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implementation( UObject* InAsset, TArray<FText>& ValidationErrors )
+EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implementation( const FAssetData& InAssetData, UObject* InAsset, FDataValidationContext& Context )
 {
 	bool bAnyFailed = false;
 	bool bAnyChecked = false;
@@ -55,8 +55,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_TextureGroup", "Texture asset texture group must be '{0}', but is '{1}'" ),
 							FText::FromString( FString::Join( TextureGroupNames, TEXT( ", " ) ) ),
-							FText::FromString( TextureGroupEnum->GetMetaData( TEXT( "DisplayName" ), Texture->LODGroup ) ) ),
-							ValidationErrors );
+							FText::FromString( TextureGroupEnum->GetMetaData( TEXT( "DisplayName" ), Texture->LODGroup ) ) ) );
 					}
 				}
 
@@ -74,8 +73,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_PixelFormat", "Texture asset pixel format must be '{0}', but is '{1}'" ),
 							FText::FromString( FString::Join( PixelFormatNames, TEXT( ", " ) ) ),
-							FText::FromString( UEnum::GetValueAsString( Texture->GetPixelFormat() ) ) ),
-							ValidationErrors );
+							FText::FromString( UEnum::GetValueAsString( Texture->GetPixelFormat() ) ) ) );
 					}
 				}
 
@@ -94,8 +92,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_PixelFormat", "Texture asset pixel format must be '{0}', but is '{1}'" ),
 							FText::FromString( FString::Join( CompressionSettingNames, TEXT( ", " ) ) ),
-							FText::FromString( CompressionSettingsEnum->GetMetaData( TEXT( "DisplayName" ), Texture->CompressionSettings ) ) ),
-							ValidationErrors );
+							FText::FromString( CompressionSettingsEnum->GetMetaData( TEXT( "DisplayName" ), Texture->CompressionSettings ) ) ) );
 					}
 				}
 
@@ -114,8 +111,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_PixelFormat", "Texture asset mip gen settings must be '{0}', but is '{1}'" ),
 							FText::FromString( FString::Join( MipGenSettingNames, TEXT( ", " ) ) ),
-							FText::FromString( MipGenSettingsEnum->GetMetaData( TEXT( "DisplayName" ), Texture->MipGenSettings ) ) ),
-							ValidationErrors );
+							FText::FromString( MipGenSettingsEnum->GetMetaData( TEXT( "DisplayName" ), Texture->MipGenSettings ) ) ) );
 					}
 				}
 
@@ -130,8 +126,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_MultipleOfFour", "Texture asset size must be a multiple of 4, but is {0}x{1}" ),
 							FText::AsNumber( Texture->GetSizeX(), &FNumberFormattingOptions::DefaultNoGrouping() ),
-							FText::AsNumber( Texture->GetSizeY(), &FNumberFormattingOptions::DefaultNoGrouping() ) ),
-							ValidationErrors );
+							FText::AsNumber( Texture->GetSizeY(), &FNumberFormattingOptions::DefaultNoGrouping() ) ) );
 					}
 					else if ( Group.ValidationRule.TextureSizeRequirements.Contains( EBUITextureSizeRequirement::PowerOfTwo )
 						&& ( !GetIsPowerOfTwo( Texture->GetSizeX() )
@@ -141,8 +136,7 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_PowerOfTwo", "Texture asset size must be a power of two, but is {0}x{1}" ),
 							FText::AsNumber( Texture->GetSizeX(), &FNumberFormattingOptions::DefaultNoGrouping() ),
-							FText::AsNumber( Texture->GetSizeY(), &FNumberFormattingOptions::DefaultNoGrouping() ) ),
-							ValidationErrors );
+							FText::AsNumber( Texture->GetSizeY(), &FNumberFormattingOptions::DefaultNoGrouping() ) ) );
 					}
 				}
 
@@ -164,8 +158,29 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 						AssetFails( InAsset, FText::Format(
 							LOCTEXT( "BUIValidatorError_Prefix", "Texture asset name must be prefixed with '{0}', but is '{1}'" ),
 							FText::FromString( FString::Join( Group.ValidationRule.Prefixes, TEXT(", ") ) ),
-							FText::FromString( Filename ) ),
-							ValidationErrors );
+							FText::FromString( Filename ) ) );
+					}
+				}
+				
+				if ( Group.ValidationRule.Suffixes.Num() > 0 )
+				{
+					bAnyChecked = true;
+					const FString Filename = FPaths::GetCleanFilename( ImportAssetPath );
+					bool bAnyMatched = false;
+					for ( const auto& Suffix : Group.ValidationRule.Suffixes )
+					{
+						if ( Filename.EndsWith( Suffix ) )
+						{
+							bAnyMatched = true;
+						}
+					}
+					if ( !bAnyMatched )
+					{
+						bAnyFailed = true;
+						AssetFails( InAsset, FText::Format(
+							LOCTEXT( "BUIValidatorError_Suffix", "Texture asset name must be suffixed with '{0}', but is '{1}'" ),
+							FText::FromString( FString::Join( Group.ValidationRule.Suffixes, TEXT(", ") ) ),
+							FText::FromString( Filename ) ) );
 					}
 				}
 
@@ -180,15 +195,30 @@ EDataValidationResult UBUIEditorValidator_Textures::ValidateLoadedAsset_Implemen
 					{
 						bAnyFailed = true;
 						AssetFails( InAsset, LOCTEXT( "BUIValidatorError_NoDataSourceFolder",
-							"Data Source Folder must be set. Please set it in Editor Preferences" ),
-							ValidationErrors );
+							"Data Source Folder must be set. Please set it in Editor Preferences" ) );
 					}
 					else if ( !ImportAssetPath.StartsWith( EditorSettings.DataSourceFolder.Path ) )
 					{
 						bAnyFailed = true;
 						AssetFails( InAsset, FText::Format( LOCTEXT( "BUIValidatorError_FileImportedOutsideDataSourceFolder", "Importing a file from '{0}', outside of Data Source Folder '{1}'" ),
 							FText::FromString( ImportAssetPath ),
-							FText::FromString( EditorSettings.DataSourceFolder.Path ) ), ValidationErrors );
+							FText::FromString( EditorSettings.DataSourceFolder.Path ) ) );
+					}
+				}
+				
+				if ( Group.ValidationRule.bSpecifySRGB )
+				{
+					bAnyChecked = true;
+
+					const UEditorPerProjectUserSettings& EditorSettings = *GetDefault<UEditorPerProjectUserSettings>();
+
+
+					if ( Texture->SRGB != Group.ValidationRule.bSRGB )
+					{
+						bAnyFailed = true;
+						AssetFails( InAsset, FText::Format( LOCTEXT( "BUIValidatorError_SRGBMismatch", "Texture asset must have sRGB set to '{0}', was set to '{1}'" ),
+							Group.ValidationRule.bSRGB ? LOCTEXT("True", "True") : LOCTEXT("False", "False"),
+							Texture->SRGB ? LOCTEXT("True", "True") : LOCTEXT("False", "False") ) );
 					}
 				}
 			}

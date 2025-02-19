@@ -22,6 +22,10 @@ public:
 	UPROPERTY( config, EditAnywhere, Category = Custom ) 
 	TArray<FString> Prefixes = { "T_UI_" };
 
+	// Match UTexture2D assets with any of these suffixes
+	UPROPERTY( config, EditAnywhere, Category = Custom ) 
+	TArray<FString> Suffixes;
+
 	// Match UTexture2D assets under any of these directories
 	UPROPERTY( EditAnywhere, meta = ( ContentDir, TitleProperty = "Path" ) )
 	TArray<FDirectoryPath> Paths;
@@ -62,6 +66,10 @@ public:
 	UPROPERTY( config, EditAnywhere )
 	TArray<FString> Prefixes = { "T_UI_" };
 
+	// Textures must have one of these suffixes. Is not applied on import
+	UPROPERTY( config, EditAnywhere )
+	TArray<FString> Suffixes;
+
 	// Textures must pass these size requirements. Is not applied on import
 	UPROPERTY( config, EditAnywhere )
 	TSet<EBUITextureSizeRequirement> TextureSizeRequirements = { EBUITextureSizeRequirement::MultipleOfFour };
@@ -73,6 +81,14 @@ public:
 	// Require that the Data Source Folder be set in Editor Preferences, and that assets are imported from there
 	UPROPERTY( EditAnywhere )
 	bool bRequireDataSourceFolder = true;
+
+	// Require that the texture
+	UPROPERTY( EditAnywhere )
+	bool bSpecifySRGB = false;
+	
+	// Require that the texture
+	UPROPERTY( EditAnywhere, meta=(EditCondition="bSpecifySRGB", EditConditionHides ) )
+	bool bSRGB = true;
 };
 
 USTRUCT()
