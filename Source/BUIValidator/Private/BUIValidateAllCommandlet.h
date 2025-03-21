@@ -1,4 +1,4 @@
-﻿// Copyright Brace Yourself Games. All Rights Reserved.
+﻿// Copyright ben ui. All Rights Reserved.
 
 #pragma once
 

@@ -1,3 +1,5 @@
+// Copyright ben ui. All Rights Reserved.
+
 #pragma once
 
 #include "EditorValidatorBase.h"

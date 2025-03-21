@@ -1,3 +1,5 @@
+// Copyright ben ui. All Rights Reserved.
+
 #include "BUIValidatorModule.h"
 #include "BUIValidatorSettings.h"
 #include "ISettingsModule.h"
@@ -9,72 +11,78 @@
 
 void FBUIValidatorModule::StartupModule()
 {
-	if ( ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>( "Settings" ) )
+	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer( "Project" );
-		ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings( "Project", "Plugins", "BUI Validator",
-			LOCTEXT( "RuntimeGeneralSettingsName", "BUI Validator" ),
-			LOCTEXT( "RuntimeGeneralSettingsDescription", "Configure UI data asset validation." ),
-			GetMutableDefault<UBUIValidatorSettings>()
-		);
+		ISettingsContainerPtr SettingsContainer = SettingsModule->GetContainer("Project");
+		ISettingsSectionPtr SettingsSection = SettingsModule->RegisterSettings(
+			"Project",
+			"Plugins",
+			"BUI Validator",
+			LOCTEXT("RuntimeGeneralSettingsName", "BUI Validator"),
+			LOCTEXT("RuntimeGeneralSettingsDescription", "Configure UI data asset validation."),
+			GetMutableDefault<UBUIValidatorSettings>());
 
-		if ( SettingsSection.IsValid() )
+		if (SettingsSection.IsValid())
 		{
-			SettingsSection->OnModified().BindRaw( this, &FBUIValidatorModule::HandleSettingsSaved );
+			SettingsSection->OnModified().BindRaw(this, &FBUIValidatorModule::HandleSettingsSaved);
 		}
 	}
 
-	FCoreDelegates::OnPostEngineInit.AddRaw( this, &FBUIValidatorModule::OnPostEngineInit );
+	FCoreDelegates::OnPostEngineInit.AddRaw(this, &FBUIValidatorModule::OnPostEngineInit);
 }
 
 void FBUIValidatorModule::ShutdownModule()
 {
-	if ( ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>( "Settings" ) )
+	if (ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>("Settings"))
 	{
-		SettingsModule->UnregisterSettings( "Project", "Project", "General" );
+		SettingsModule->UnregisterSettings("Project", "Project", "General");
 	}
 
-	if ( GIsEditor )
+	if (GIsEditor)
 	{
-		if ( GEditor && GEditor->GetEditorSubsystem<UImportSubsystem>() )
-			GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetPostImport.RemoveAll( this );
+		if (GEditor && GEditor->GetEditorSubsystem<UImportSubsystem>())
+			GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetPostImport.RemoveAll(this);
 	}
 }
 
 void FBUIValidatorModule::OnPostEngineInit()
 {
-	if ( GIsEditor )
+	if (GIsEditor)
 	{
-		GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetPostImport.AddRaw( this, &FBUIValidatorModule::OnObjectReimported );
+		GEditor->GetEditorSubsystem<UImportSubsystem>()->OnAssetPostImport.AddRaw(
+			this, &FBUIValidatorModule::OnObjectReimported);
 	}
 }
 
-void FBUIValidatorModule::OnObjectReimported( UFactory* ImportFactory, UObject* InObject )
+void FBUIValidatorModule::OnObjectReimported(UFactory* ImportFactory, UObject* InObject)
 {
-	UTexture2D* Texture = Cast<UTexture2D>( InObject );
-	if ( !Texture )
+	UTexture2D* Texture = Cast<UTexture2D>(InObject);
+	if (!Texture)
 		return;
 
 	// Only apply defaults to newly-imported assets
 	const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
-	for ( const auto& Group : ValidatorSettings.ValidationGroups )
+	for (const auto& Group : ValidatorSettings.ValidationGroups)
 	{
-		if ( Group.bApplyOnImport
-			&& Group.ShouldGroupValidateAsset( InObject ) )
+		if (Group.bApplyOnImport
+			&& Group.ShouldGroupValidateAsset(InObject))
 		{
-			if ( Group.ValidationRule.TextureGroups.Num() > 0 && !Group.ValidationRule.TextureGroups.Contains( Texture->LODGroup ) )
+			if (Group.ValidationRule.TextureGroups.Num() > 0 && !Group.ValidationRule.TextureGroups.Contains(
+				Texture->LODGroup))
 			{
-				Texture->LODGroup = Group.ValidationRule.TextureGroups[ 0 ];
+				Texture->LODGroup = Group.ValidationRule.TextureGroups[0];
 			}
 
-			if ( Group.ValidationRule.CompressionSettings.Num() > 0 && !Group.ValidationRule.CompressionSettings.Contains( Texture->CompressionSettings ) )
+			if (Group.ValidationRule.CompressionSettings.Num() > 0 && !Group.ValidationRule.CompressionSettings.
+			                                                                 Contains(Texture->CompressionSettings))
 			{
-				Texture->CompressionSettings = Group.ValidationRule.CompressionSettings[ 0 ];
+				Texture->CompressionSettings = Group.ValidationRule.CompressionSettings[0];
 			}
 
-			if ( Group.ValidationRule.MipGenSettings.Num() > 0 && !Group.ValidationRule.MipGenSettings.Contains( Texture->MipGenSettings ))
+			if (Group.ValidationRule.MipGenSettings.Num() > 0 && !Group.ValidationRule.MipGenSettings.Contains(
+				Texture->MipGenSettings))
 			{
-				Texture->MipGenSettings = Group.ValidationRule.MipGenSettings[ 0 ];
+				Texture->MipGenSettings = Group.ValidationRule.MipGenSettings[0];
 			}
 		}
 	}
@@ -88,7 +96,7 @@ bool FBUIValidatorModule::HandleSettingsSaved()
 	// You can put any validation code in here and resave the settings in case an invalid
 	// value has been entered
 
-	if ( ResaveSettings )
+	if (ResaveSettings)
 	{
 		Settings->SaveConfig();
 	}
@@ -98,5 +106,4 @@ bool FBUIValidatorModule::HandleSettingsSaved()
 
 #undef LOCTEXT_NAMESPACE
 
-IMPLEMENT_MODULE( FBUIValidatorModule, BUIValidator )
-
+IMPLEMENT_MODULE(FBUIValidatorModule, BUIValidator)

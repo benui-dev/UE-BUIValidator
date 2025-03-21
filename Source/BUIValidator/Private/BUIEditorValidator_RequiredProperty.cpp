@@ -1,9 +1,8 @@
+// Copyright ben ui. All Rights Reserved.
+
 #include "BUIEditorValidator_RequiredProperty.h"
-#include <Engine/Texture2D.h>
-#include <Editor/EditorPerProjectUserSettings.h>
-#include <EditorFramework/AssetImportData.h>
-#include "BUIValidatorSettings.h"
-#include <UObject/UnrealType.h>
+#include "Engine/Texture2D.h"
+#include "UObject/UnrealType.h"
 
 #define LOCTEXT_NAMESPACE "BUIEditorValidator"
 
@@ -15,11 +14,11 @@ UBUIEditorValidator_RequiredProperty::UBUIEditorValidator_RequiredProperty()
 	bIsEnabled = true;
 }
 
-bool UBUIEditorValidator_RequiredProperty::CanValidateAsset_Implementation( UObject* InAsset ) const
+bool UBUIEditorValidator_RequiredProperty::CanValidateAsset_Implementation(UObject* InAsset) const
 {
 	UClass* AssetClass = nullptr;
-	UBlueprint* Bp = Cast<UBlueprint>( InAsset );
-	if ( Bp && Bp->ParentClass )
+	UBlueprint* Bp = Cast<UBlueprint>(InAsset);
+	if (Bp && Bp->ParentClass)
 	{
 		AssetClass = Bp->ParentClass;
 	}
@@ -27,9 +26,9 @@ bool UBUIEditorValidator_RequiredProperty::CanValidateAsset_Implementation( UObj
 	{
 		AssetClass = InAsset->GetClass();
 	}
-	for ( TFieldIterator<FProperty> PropertyIterator( AssetClass ); PropertyIterator; ++PropertyIterator )
+	for (TFieldIterator<FProperty> PropertyIterator(AssetClass); PropertyIterator; ++PropertyIterator)
 	{
-		if ( PropertyIterator->GetBoolMetaData( PropertyName ) )
+		if (PropertyIterator->GetBoolMetaData(PropertyName))
 		{
 			return true;
 		}
@@ -37,14 +36,15 @@ bool UBUIEditorValidator_RequiredProperty::CanValidateAsset_Implementation( UObj
 	return false;
 }
 
-EDataValidationResult UBUIEditorValidator_RequiredProperty::ValidateLoadedAsset_Implementation( UObject* InAsset, TArray<FText>& ValidationErrors )
+EDataValidationResult UBUIEditorValidator_RequiredProperty::ValidateLoadedAsset_Implementation(
+	UObject* InAsset, TArray<FText>& ValidationErrors)
 {
 	bool bAnyFailed = false;
 	bool bAnyChecked = false;
 
 	UClass* AssetClass = nullptr;
-	UBlueprint* Bp = Cast<UBlueprint>( InAsset );
-	if ( Bp && Bp->ParentClass )
+	UBlueprint* Bp = Cast<UBlueprint>(InAsset);
+	if (Bp && Bp->ParentClass)
 	{
 		AssetClass = Bp->GeneratedClass;
 	}
@@ -53,36 +53,36 @@ EDataValidationResult UBUIEditorValidator_RequiredProperty::ValidateLoadedAsset_
 		AssetClass = InAsset->GetClass();
 	}
 
-	UObject* MyCDO = AssetClass->GetDefaultObject( true );
-	for ( TFieldIterator<FProperty> PropertyIterator( AssetClass ); PropertyIterator; ++PropertyIterator )
+	UObject* MyCDO = AssetClass->GetDefaultObject(true);
+	for (TFieldIterator<FProperty> PropertyIterator(AssetClass); PropertyIterator; ++PropertyIterator)
 	{
-		if ( PropertyIterator->GetBoolMetaData( PropertyName ) )
+		if (PropertyIterator->GetBoolMetaData(PropertyName))
 		{
 			bAnyChecked = true;
-			FObjectPropertyBase* ObjProp = CastField<FObjectPropertyBase>( *PropertyIterator );
-			if ( ObjProp )
+			FObjectPropertyBase* ObjProp = CastField<FObjectPropertyBase>(*PropertyIterator);
+			if (ObjProp)
 			{
-				UObject* Something = ObjProp->GetObjectPropertyValue_InContainer( MyCDO );
+				UObject* Something = ObjProp->GetObjectPropertyValue_InContainer(MyCDO);
 
-				if ( Something == nullptr )
+				if (Something == nullptr)
 				{
 					bAnyFailed = true;
-					AssetFails( InAsset, FText::FormatNamed(
-						LOCTEXT( "BUIValidatorError_NotSet", "Property '{PropertyName}' is not set. All variables marked with '{BUIMetaName}' must be set to non-null" ),
+					AssetFails(InAsset, FText::FormatNamed(
+						LOCTEXT("BUIValidatorError_NotSet", "Property '{PropertyName}' is not set. All variables marked with '{BUIMetaName}' must be set to non-null"),
 						"PropertyName", ObjProp->GetDisplayNameText(),
-						"BUIMetaName", FText::FromName( PropertyName ) ),
-						ValidationErrors );
+						"BUIMetaName", FText::FromName(PropertyName)),
+						ValidationErrors);
 				}
 			}
 		}
 	}
 
-	if ( !bAnyChecked )
+	if (!bAnyChecked)
 		return EDataValidationResult::NotValidated;
 
-	if ( !bAnyFailed )
+	if (!bAnyFailed)
 	{
-		AssetPasses( InAsset );
+		AssetPasses(InAsset);
 	}
 	return bAnyFailed ? EDataValidationResult::Invalid : EDataValidationResult::Valid;
 }

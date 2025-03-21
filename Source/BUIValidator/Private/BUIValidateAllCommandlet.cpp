@@ -1,17 +1,13 @@
-﻿// Copyright Brace Yourself Games. All Rights Reserved.
+﻿// Copyright ben ui. All Rights Reserved.
 
 #include "BUIValidateAllCommandlet.h"
-
-#include "BUIValidatorModule.h"
-#include "BUIValidatorSettings.h"
-#include "AssetRegistry/AssetRegistryModule.h"
 
 DEFINE_LOG_CATEGORY(LogCommandletPlugin);
 
 UBUIValidateAllCommandlet::UBUIValidateAllCommandlet()
 {
 	HelpDescription = "Runs existing validation rules on all assets";
-	HelpWebLink = "https://github.com/benui-dev/UE4-BUIValidator";
+	HelpWebLink = "https://github.com/benui-dev/UE-BUIValidator";
 	
 	IsClient = false;
 	IsEditor = false;

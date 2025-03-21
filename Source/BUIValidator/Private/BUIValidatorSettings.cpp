@@ -1,17 +1,19 @@
+// Copyright ben ui. All Rights Reserved.
+
 #include "BUIValidatorSettings.h"
-#include <Engine/Texture2D.h>
+#include "Engine/Texture2D.h"
 
 #define LOCTEXT_NAMESPACE "BUIEditorValidator"
 
-bool UBUIValidatorSettings::ShouldValidateAsset( UObject* InAsset ) const
+bool UBUIValidatorSettings::ShouldValidateAsset(UObject* InAsset) const
 {
-	UTexture2D* Texture = Cast<UTexture2D>( InAsset );
-	if ( Texture )
+	UTexture2D* Texture = Cast<UTexture2D>(InAsset);
+	if (Texture)
 	{
 		const UBUIValidatorSettings& ValidatorSettings = *GetDefault<UBUIValidatorSettings>();
-		for ( const auto& Group : ValidatorSettings.ValidationGroups )
+		for (const auto& Group : ValidatorSettings.ValidationGroups)
 		{
-			if ( Group.ShouldGroupValidateAsset( InAsset ) )
+			if (Group.ShouldGroupValidateAsset(InAsset))
 				return true;
 		}
 	}
@@ -19,21 +21,21 @@ bool UBUIValidatorSettings::ShouldValidateAsset( UObject* InAsset ) const
 	return false;
 }
 
-bool FBUIValidatorGroup::ShouldGroupValidateAsset( UObject* InAsset ) const
+bool FBUIValidatorGroup::ShouldGroupValidateAsset(UObject* InAsset) const
 {
-	UTexture2D* Texture = Cast<UTexture2D>( InAsset );
-	if ( !Texture )
+	UTexture2D* Texture = Cast<UTexture2D>(InAsset);
+	if (!Texture)
 		return false;
 
 	const FString AssetPathInUnreal = Texture->GetPathName();
 
 	bool bMatchAnyTextureGroup = MatchConditions.TextureGroups.Num() == 0
-		|| MatchConditions.TextureGroups.Contains( Texture->LODGroup );
+		|| MatchConditions.TextureGroups.Contains(Texture->LODGroup);
 
 	bool bMatchAnyPath = MatchConditions.Paths.Num() == 0;
-	for ( const auto& Path : MatchConditions.Paths )
+	for (const auto& Path : MatchConditions.Paths)
 	{
-		if ( AssetPathInUnreal.StartsWith( Path.Path ) )
+		if (AssetPathInUnreal.StartsWith(Path.Path))
 		{
 			bMatchAnyPath = true;
 			break;
@@ -41,19 +43,19 @@ bool FBUIValidatorGroup::ShouldGroupValidateAsset( UObject* InAsset ) const
 	}
 
 	bool bMatchAnyPrefix = MatchConditions.Prefixes.Num() == 0;
-	for ( const auto& Prefix : MatchConditions.Prefixes )
+	for (const auto& Prefix : MatchConditions.Prefixes)
 	{
-		if ( FPaths::GetCleanFilename( AssetPathInUnreal ).StartsWith( Prefix ) )
+		if (FPaths::GetCleanFilename(AssetPathInUnreal).StartsWith(Prefix))
 		{
 			bMatchAnyPrefix = true;
 			break;
 		}
 	}
-	
+
 	bool bMatchAnySuffix = MatchConditions.Suffixes.Num() == 0;
-	for ( const auto& Suffix : MatchConditions.Suffixes )
+	for (const auto& Suffix : MatchConditions.Suffixes)
 	{
-		if ( FPaths::GetCleanFilename( AssetPathInUnreal ).EndsWith( Suffix ) )
+		if (FPaths::GetCleanFilename(AssetPathInUnreal).EndsWith(Suffix))
 		{
 			bMatchAnySuffix = true;
 			break;
