@@ -1,10 +1,9 @@
 #include "BUIValidatorModule.h"
 #include "BUIValidatorSettings.h"
-#include <ISettingsModule.h>
-#include <ISettingsSection.h>
-#include <ISettingsContainer.h>
-#include <Subsystems/ImportSubsystem.h>
-#include <Factories/TextureFactory.h>
+#include "ISettingsModule.h"
+#include "ISettingsSection.h"
+#include "ISettingsContainer.h"
+#include "Subsystems/ImportSubsystem.h"
 
 #define LOCTEXT_NAMESPACE "FBUIValidatorModule"
 
@@ -32,7 +31,7 @@ void FBUIValidatorModule::ShutdownModule()
 {
 	if ( ISettingsModule* SettingsModule = FModuleManager::GetModulePtr<ISettingsModule>( "Settings" ) )
 	{
-		SettingsModule->UnregisterSettings( "Project", "CustomSettings", "General" );
+		SettingsModule->UnregisterSettings( "Project", "Project", "General" );
 	}
 
 	if ( GIsEditor )
